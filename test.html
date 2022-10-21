@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.10/dist/vue.js"></script>
+    <title>Vue.js Pet Depot</title>
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1 v-text="sitename"></h1>
+      </header>
+      <main>
+        <figure>
+          <img v-bind:src="product.image" alt="" />
+        </figure>
+        <h2 v-text="product.title"></h2>
+        <p v-text="product.description"></p>
+        <p>Price: {{product.price}}</p>
+        <button v-on:click="addToCart">Add to cart</button>
+      </main>
+    </div>
+
+    <!-- <script src="../src/main.js"></script> -->
+    <script>
+      var webstore = new Vue({
+        el: "#app",
+        data: {
+          sitename: "Vue.js Pet Depot",
+          product: {
+            id: 1001,
+            image:
+              "https://static.wikia.nocookie.net/seuss/images/9/9a/Img_drseuss_cat.gif",
+            title: "cat",
+            price: 2000,
+            description:
+              "    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi dolorum dolor neque nostrum ipsum vel.",
+          },
+          cart: [],
+        },
+        methods: {
+          addToCart: function () {
+            this.cart.push(this.product.id);
+            console.log(111);
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
