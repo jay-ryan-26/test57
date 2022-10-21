@@ -4,7 +4,17 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
+    <!-- <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+    /> -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.10/dist/vue.js"></script>
     <title>Vue.js Pet Depot</title>
   </head>
@@ -12,6 +22,10 @@
     <div id="app">
       <header>
         <h1 v-text="sitename"></h1>
+        <button>
+          {{cartItemCount}}
+          <span><i class="fa-solid fa-cart-shopping"></i> &nbsp; Checkout</span>
+        </button>
       </header>
       <main>
         <figure>
@@ -20,7 +34,8 @@
         <h2 v-text="product.title"></h2>
         <p v-text="product.description"></p>
         <p>Price: {{product.price}}</p>
-        <button v-on:click="addToCart">Add to cart</button>
+        <button v-on:click="addToCart" v-if="canAddToCart">Add to cart</button>
+        <button disabled v-else>Add to cart</button>
       </main>
     </div>
 
@@ -36,15 +51,22 @@
               "https://static.wikia.nocookie.net/seuss/images/9/9a/Img_drseuss_cat.gif",
             title: "cat",
             price: 2000,
-            description:
-              "    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi dolorum dolor neque nostrum ipsum vel.",
+            description: "pog",
+            availableInventory: 5,
           },
           cart: [],
         },
         methods: {
           addToCart: function () {
             this.cart.push(this.product.id);
-            console.log(111);
+          },
+        },
+        computed: {
+          cartItemCount: function () {
+            return this.cart.length || "";
+          },
+          canAddToCart() {
+            return this.product.availableInventory > this.cartItemCount;
           },
         },
       });
