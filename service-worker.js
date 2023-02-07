@@ -10,3 +10,21 @@ self.addEventListener("install", (e) => {
     })
   );
 });
+self.addEventListener("fetch", (e) => {
+  e.respondWith(
+    // CHECK WIF TGE CACHE HAS THE FILE
+    caches.match(e.request).then((r) => {
+      console.log("[Service Worker] Fetching Resources" + e.request.url);
+      // 'r' IS THE MATCHING FILE IF IT EXISTS IN THE CACHE || DOWNLOAD IF FILE DOESNT EXIST
+      return (
+        r ||
+        fetch(e.request).then((res) => {
+          return caches.open(cacheName).then((cache) => {
+            cache.put(e.request, res.clone());
+            return res;
+          });
+        })
+      );
+    })
+  );
+});
