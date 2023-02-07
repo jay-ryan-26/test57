@@ -1,18 +1,10 @@
+<!-- TESTING LOOP -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-
-    <style>
-      .product {
-        border: 1px grey solid;
-        padding: 20px;
-        margin: 20px;
-        text-align: center;
-      }
-    </style>
 
     <link
       rel="stylesheet"
@@ -21,14 +13,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <script src="./products.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.10/dist/vue.js"></script>
-    <link rel="manifest" href="petstore.webmanifest" />
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("service-worker.js");
-      }
-    </script>
     <title>Vue.js Pet Depot</title>
   </head>
   <body>
@@ -42,40 +27,41 @@
       </header>
       <main>
         <div v-if="showProduct">
-          <div class="product" v-for="product in sortedProducts">
-            <figure>
-              <img v-bind:src="product.image" alt="yes" />
-            </figure>
-            <h2 v-text="product.title"></h2>
-            <p v-text="product.description"></p>
-            <p>Price: {{product.price}}</p>
-            <button
-              v-on:click="addToCart(product)"
-              v-if="canAddToCart(product)"
-            >
-              Add to cart
-            </button>
-            <button disabled v-else>Add to cart</button>
-            <span v-if="product.availableInventory === cartCount(product.id)"
-              >All Out</span
-            >
-            <span
-              v-else-if="product.availableInventory - cartCount(product.id) < 5"
-            >
-              Only {{product.availableInventory - cartCount(product.id)}} left!
-            </span>
-            <span v-else>Buy Now!</span>
+          <figure>
+            <img v-bind:src="product.image" alt="yes" />
+          </figure>
+          <h2 v-text="product.title"></h2>
+          <p v-text="product.description"></p>
+          <p>Price: {{product.price}}</p>
+          <button v-on:click="addToCart" v-if="canAddToCart">
+            Add to cart
+          </button>
+          <span v-if="product.availableInventory === cartItemCount"
+            >All Out</span
+          >
+          <span v-else-if="product.availableInventory - cartItemCount < 5">
+            Only {{product.availableInventory - cartItemCount}} left!
+          </span>
+          <span v-else>Buy Now!</span>
+          <button disabled v-else>Add to cart</button>
+          <div>
+            <span v-for="n in product.rating"
+              ><i class="fa-solid fa-star"></i
+            ></span>
+            <span v-for="n in 5-product.rating"
+              ><i class="fa-regular fa-star"></i
+            ></span>
           </div>
         </div>
         <div v-else>
           <h2>Checkout</h2>
           <p>
             <strong> First Name: </strong>
-            <input type="text" v-model="order.firstName" />
+            <input type="text" v-model.trim="order.firstName" />
           </p>
           <p>
             <strong> Last Name: </strong>
-            <input type="text" v-model="order.lastName" />
+            <input type="text" v-model.trim="order.lastName" />
           </p>
           <hr />
           <h2>Order Information</h2>
@@ -90,8 +76,8 @@
             <strong>State:</strong> {{order.state}}
             <select v-model="order.state" class="form-control">
               <option disabled value="">State</option>
-              <option v-for="(state,key) in states" v-bind:value="state">
-                {{key}}
+              <option v-for="state in states" v-bind:value="state">
+                {{state}}
               </option>
               <!-- <option v-bind:value="states.AL">AL</option>
               <option v-bind:value="states.AR">AR</option>
@@ -101,7 +87,7 @@
           </p>
           <p>
             <strong>Zip/Postal Code:</strong>
-            <input v-model="order.zip" />
+            <input type="number" v-model="order.zip" />
           </p>
           <p>
             <input
@@ -126,28 +112,38 @@
             <label for="business">Business</label>
           </p>
           <button v-on:click="submitForm">Place Order</button>
+          <!-- <p v-if="cartItemCount != 0">
+            <ul>
+              <li v-for="item in cart">
+                {{product.id}} | {{product.title}} - {{product.price}}
+              </li>
+            </ul>
+          </p>
+          <p v-else>
+            Your cart is empty.
+          </p> -->
+          <!-- <button v-on:click="showProduct">Continue shopping</button> -->
         </div>
       </main>
     </div>
 
+    <!-- <script src="../src/main.js"></script> -->
     <script>
       var webstore = new Vue({
         el: "#app",
         data: {
           sitename: "Vue.js Pet Depot",
           showProduct: true,
-          products: products,
-
-          // {
-          //   id: 1001,
-          //   image:
-          //     "https://static.wikia.nocookie.net/seuss/images/9/9a/Img_drseuss_cat.gif",
-          //   title: "cat",
-          //   price: 2000,
-          //   description: "pog",
-          //   availableInventory: 5,
-          //   rating: 3,
-          // },
+          product: {
+            id: 1001,
+            image:
+              "https://static.wikia.nocookie.net/seuss/images/9/9a/Img_drseuss_cat.gif",
+            title: "cat",
+            price: 2000,
+            description: "pog",
+            availableInventory: 6,
+            rating: 3,
+          },
           order: {
             firstName: "",
             lastName: "",
@@ -160,48 +156,27 @@
             sendGift: "Send As A gift",
             dontSendGift: "Do Not Send As A gift",
           },
-          states: {
-            AL: "Alabama",
-            AR: "Arkansas",
-            CA: "California",
-            NV: "Nevada",
-          },
+          states: ["Alabama", "Arkansas", "California", "Nevada"],
           cart: [],
           showProduct: true,
         },
         methods: {
-          addToCart(products) {
-            this.cart.push(this.products.id);
+          addToCart: function () {
+            this.cart.push(this.product.id);
           },
           showCheckout() {
             this.showProduct = this.showProduct ? false : true;
-            // console.log(cartCount(product.id));
           },
           submitForm() {
             alert("Order Submitted");
-          },
-          canAddToCart(product) {
-            return product.availableInventory > this.cartCount(product.id);
-          },
-          cartCount(id) {
-            let count = 0;
-            for (let i = 0; i < this.cart.length; i++) {
-              if (this.cart[i] === id) [count++];
-            }
-            return count;
           },
         },
         computed: {
           cartItemCount: function () {
             return this.cart.length || "";
           },
-          sortedProducts() {
-            let productsArray = this.products.slice(0);
-            function compare(a, b) {
-              if (a.price > b.price) return 1;
-              if (a.price < b.price) return -1;
-            }
-            return productsArray.sort(compare);
+          canAddToCart() {
+            return this.product.availableInventory > this.cartItemCount;
           },
         },
       });
